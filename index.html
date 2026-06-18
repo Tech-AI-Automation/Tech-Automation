@@ -1,0 +1,739 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#0a0e14" />
+<title>SVATech Automations — Automation that runs like production.</title>
+<meta name="description" content="Done-for-you automation for founders and engineering teams: lead follow-up, meeting logging, observability, incident response, and security ops — built with the reliability discipline of an SRE, on the tools you already pay for." />
+<meta property="og:title" content="SVATech Automations — Automation that runs like production." />
+<meta property="og:description" content="Growth, observability, reliability, and security automation — built on tools you already pay for, owned by you." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0e14; --ink-2:#0e131c; --ink-3:#141b27;
+    --line:#1e2836; --line-2:#2a384b;
+    --paper:#eef2f7; --muted:#8696ab; --muted-2:#5d6e85;
+    --signal:#ffb245; --signal-dim:#7a5722;
+    --teal:#3ad6c5; --red:#ff6b6b;
+    --maxw:1180px; --r:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  body{margin:0;background:var(--ink);color:var(--paper);
+    font-family:"Inter",system-ui,sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(900px 520px at 78% -8%, rgba(255,178,69,.10), transparent 60%),
+      radial-gradient(720px 520px at 0% 2%, rgba(58,214,197,.05), transparent 55%)}
+  .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:64px 64px;
+    -webkit-mask-image:radial-gradient(circle at 50% 0%, #000 0%, transparent 72%);
+            mask-image:radial-gradient(circle at 50% 0%, #000 0%, transparent 72%)}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px;position:relative;z-index:1}
+  a{color:inherit;text-decoration:none}
+
+  h1,h2,h3{font-family:"Space Grotesk",sans-serif;font-weight:600;letter-spacing:-.02em;line-height:1.05;margin:0}
+  .eyebrow{font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:500;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--signal);display:inline-flex;align-items:center;gap:9px}
+  .eyebrow::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--signal);box-shadow:0 0 10px var(--signal)}
+  p{margin:0}
+
+  .btn{display:inline-flex;align-items:center;gap:9px;cursor:pointer;border:0;
+    font-family:"Space Grotesk";font-weight:600;font-size:15px;padding:13px 22px;border-radius:11px;
+    transition:transform .15s,box-shadow .15s,background .15s,border-color .15s}
+  .btn-primary{background:var(--signal);color:#241600;box-shadow:0 0 0 1px rgba(255,178,69,.5),0 12px 34px -12px rgba(255,178,69,.6)}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--signal),0 18px 40px -12px rgba(255,178,69,.75)}
+  .btn-ghost{background:transparent;color:var(--paper);border:1px solid var(--line-2)}
+  .btn-ghost:hover{border-color:var(--signal);color:var(--signal)}
+  .btn:focus-visible{outline:2px solid var(--signal);outline-offset:3px}
+
+  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);
+    background:rgba(10,14,20,.72);border-bottom:1px solid transparent;transition:border-color .25s}
+  header.nav.scrolled{border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:68px}
+  .brand{display:flex;align-items:center;gap:11px;font-family:"Space Grotesk";font-weight:700;font-size:17px}
+  .brand .mark{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;
+    background:linear-gradient(140deg,var(--signal),#ff8a3c);color:#241600;
+    font-family:"JetBrains Mono";font-weight:700;font-size:14px;box-shadow:0 6px 18px -8px rgba(255,178,69,.8)}
+  .brand small{color:var(--muted-2);font-family:"JetBrains Mono";font-weight:400;font-size:11px}
+  .nav-links{display:flex;align-items:center;gap:28px}
+  .nav-links a{color:var(--muted);font-size:14px;font-weight:500;transition:color .15s}
+  .nav-links a:hover{color:var(--paper)}
+  .nav-cta{display:flex;align-items:center;gap:14px}
+  .menu-btn{display:none;background:none;border:1px solid var(--line-2);border-radius:9px;color:var(--paper);
+    padding:8px 12px;cursor:pointer;font-size:13px;font-family:"JetBrains Mono"}
+
+  .hero{padding:74px 0 50px}
+  .hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:54px;align-items:center}
+  h1{font-size:clamp(38px,6vw,64px)}
+  h1 .accent{color:var(--signal)}
+  h1 .strike{position:relative;color:var(--muted)}
+  h1 .strike::after{content:"";position:absolute;left:-2%;right:-2%;top:54%;height:3px;background:var(--red);border-radius:3px;transform:rotate(-2.5deg)}
+  .hero-sub{color:var(--muted);font-size:clamp(16px,1.7vw,18px);margin-top:24px;max-width:42ch}
+  .pillars{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+  .pill{font-family:"JetBrains Mono";font-size:11.5px;color:var(--muted);border:1px solid var(--line-2);
+    border-radius:999px;padding:6px 13px;display:flex;align-items:center;gap:7px}
+  .pill i{width:6px;height:6px;border-radius:50%;background:var(--teal)}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+
+  .console{background:linear-gradient(180deg,var(--ink-2),var(--ink));border:1px solid var(--line);
+    border-radius:var(--r);overflow:hidden;box-shadow:0 40px 90px -50px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.03)}
+  .console-bar{display:flex;align-items:center;gap:9px;padding:13px 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.015)}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .console-bar .title{margin-left:8px;font-family:"JetBrains Mono";font-size:12px;color:var(--muted)}
+  .live{margin-left:auto;font-family:"JetBrains Mono";font-size:11px;color:var(--teal);display:flex;align-items:center;gap:7px}
+  .live .p{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  .stream{padding:8px 0;height:330px;overflow:hidden;position:relative;font-family:"JetBrains Mono";font-size:13px}
+  .stream::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;background:linear-gradient(transparent,var(--ink))}
+  .ev{display:grid;grid-template-columns:64px 18px 1fr;gap:10px;align-items:start;padding:9px 18px;opacity:0;transform:translateY(8px);animation:evin .5s forwards}
+  @keyframes evin{to{opacity:1;transform:none}}
+  .ev .t{color:var(--muted-2);font-size:11.5px;padding-top:1px}
+  .ev .i{font-size:13px;padding-top:1px}
+  .ev .m b{color:var(--signal);font-weight:500}
+  .ev .m .ok{color:var(--teal)} .ev .m .tag{color:var(--muted)} .ev .m .warn{color:var(--signal)}
+
+  .marquee-sec{padding:26px 0 8px}
+  .marquee-label{text-align:center;font-family:"JetBrains Mono";font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted-2);margin-bottom:20px}
+  .marquee{position:relative;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+  .marquee-track{display:flex;gap:44px;width:max-content;animation:scroll 38s linear infinite}
+  @media (prefers-reduced-motion:reduce){.marquee-track{animation:none;flex-wrap:wrap;justify-content:center}}
+  .marquee:hover .marquee-track{animation-play-state:paused}
+  @keyframes scroll{to{transform:translateX(-50%)}}
+  .chip{font-family:"JetBrains Mono";font-size:14px;color:var(--muted);white-space:nowrap;display:flex;align-items:center;gap:9px}
+  .chip::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--line-2)}
+
+  section{position:relative;z-index:1}
+  section[id], main[id]{scroll-margin-top:86px}
+  .sec{padding:92px 0}
+  .sec-head{max-width:64ch;margin-bottom:18px}
+  .sec-head h2{font-size:clamp(28px,3.7vw,42px);margin-top:14px}
+  .sec-head p{color:var(--muted);margin-top:16px;font-size:17px}
+
+  .lane{display:flex;align-items:center;gap:14px;margin:46px 0 22px}
+  .lane h3{font-family:"Space Grotesk";font-size:15px;font-weight:600;letter-spacing:.02em;color:var(--paper);white-space:nowrap}
+  .lane .tag{font-family:"JetBrains Mono";font-size:11px;color:var(--ink);background:var(--signal);padding:3px 9px;border-radius:6px;font-weight:700}
+  .lane .tag.b{background:var(--teal)}
+  .lane .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line-2),transparent)}
+  .lane-desc{max-width:72ch;margin:-4px 0 28px;color:var(--muted);font-size:15px;line-height:1.65;border-left:2px solid var(--signal);padding-left:18px}
+  .lane-desc b{color:var(--paper);font-weight:600}
+  .lane-desc .goal{display:block;font-family:"Space Grotesk";font-weight:600;font-size:16px;color:var(--paper);margin-bottom:8px}
+
+  .systems{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  .card{background:linear-gradient(180deg,var(--ink-3),var(--ink-2));border:1px solid var(--line);
+    border-radius:var(--r);padding:26px 24px;display:flex;flex-direction:column;position:relative;overflow:hidden;transition:border-color .2s,transform .2s}
+  .card::before{content:"";position:absolute;inset:0;border-radius:var(--r);padding:1px;
+    background:linear-gradient(180deg,rgba(255,178,69,.35),transparent 40%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .25s}
+  .card.b::before{background:linear-gradient(180deg,rgba(58,214,197,.35),transparent 40%)}
+  .card:hover{transform:translateY(-4px);border-color:var(--line-2)}
+  .card:hover::before{opacity:1}
+  .card .num{font-family:"JetBrains Mono";font-size:12px;color:var(--signal);letter-spacing:.1em}
+  .card.b .num{color:var(--teal)}
+  .card h3{font-size:20px;margin:14px 0 10px}
+  .card .lede{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .card ul{list-style:none;padding:0;margin:0 0 20px;display:flex;flex-direction:column;gap:10px}
+  .card li{display:flex;gap:11px;font-size:13.5px;color:#c4d0de;line-height:1.45}
+  .card li::before{content:"\203A";color:var(--signal);font-family:"JetBrains Mono";font-weight:700}
+  .card.b li::before{color:var(--teal)}
+  .outcome{margin-top:auto;border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:4px}
+  .outcome .k{font-family:"JetBrains Mono";font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2)}
+  .outcome .v{font-family:"Space Grotesk";font-weight:600;font-size:14.5px;color:var(--teal)}
+  .card.b .outcome .v{color:var(--signal)}
+
+  .caps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .cap{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:24px 22px;display:flex;flex-direction:column;transition:border-color .2s,transform .2s}
+  .cap:hover{border-color:var(--line-2);transform:translateY(-3px)}
+  .cap .ix{font-family:"JetBrains Mono";font-size:12px;color:var(--signal);letter-spacing:.1em;margin-bottom:12px}
+  .cap h3{font-size:18px;margin:0 0 8px}
+  .cap p{color:var(--muted);font-size:13.5px;margin-bottom:14px}
+  .cap .roles{font-family:"JetBrains Mono";font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+  .cap .stack{display:flex;flex-wrap:wrap;gap:7px;margin-top:auto}
+  .cap .stack span{font-family:"JetBrains Mono";font-size:11px;color:var(--muted);border:1px solid var(--line-2);border-radius:6px;padding:3px 8px}
+  .process{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .step{background:var(--ink-2);border:1px solid var(--line);border-radius:var(--r);padding:24px 22px;position:relative}
+  .step .n{font-family:"JetBrains Mono";font-size:13px;color:var(--ink);background:var(--signal);width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:700;margin-bottom:18px}
+  .step h3{font-size:17px;margin-bottom:9px}
+  .step p{color:var(--muted);font-size:14px}
+  .step .opt{position:absolute;top:24px;right:22px;font-family:"JetBrains Mono";font-size:10px;color:var(--muted-2);border:1px solid var(--line-2);border-radius:5px;padding:2px 7px}
+
+  .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;align-items:stretch}
+  .tier{background:linear-gradient(180deg,var(--ink-2),var(--ink));border:1px solid var(--line);border-radius:16px;padding:30px 26px;display:flex;flex-direction:column;position:relative}
+  .tier.feature{border-color:var(--signal);box-shadow:0 30px 80px -50px rgba(255,178,69,.5)}
+  .tier .badge{position:absolute;top:-12px;left:26px;font-family:"JetBrains Mono";font-size:10.5px;letter-spacing:.1em;
+    background:var(--signal);color:#241600;padding:5px 11px;border-radius:7px;font-weight:700}
+  .tier .badge.v{background:var(--teal)}
+  .tier .name{font-family:"Space Grotesk";font-weight:600;font-size:20px}
+  .tier .for{color:var(--muted-2);font-size:13px;margin-top:6px;min-height:38px}
+  .tier .price{margin:18px 0 4px;font-family:"Space Grotesk";font-weight:700;font-size:40px;letter-spacing:-.03em;display:flex;align-items:baseline;gap:6px}
+  .tier .price .per{font-size:14px;font-weight:500;color:var(--muted);font-family:"Inter"}
+  .tier .save{font-family:"JetBrains Mono";font-size:11.5px;color:var(--teal);margin-bottom:18px;min-height:17px}
+  .tier ul{list-style:none;padding:0;margin:0 0 24px;display:flex;flex-direction:column;gap:11px}
+  .tier li{display:flex;gap:10px;font-size:13.5px;color:#c4d0de;line-height:1.4}
+  .tier li::before{content:"\2713";color:var(--teal);font-weight:700;font-size:13px}
+  .tier li.muted{color:var(--muted-2)} .tier li.muted::before{content:"\2013";color:var(--muted-2)}
+  .tier .btn{justify-content:center;margin-top:auto}
+  .price-note{margin-top:18px;font-family:"JetBrains Mono";font-size:11px;color:var(--signal-dim);text-align:center}
+
+  .about{display:block;max-width:880px}
+  .about h2{font-size:clamp(26px,3.4vw,38px);margin-bottom:18px}
+  .about p{color:var(--muted);font-size:16px;margin-bottom:16px}
+  .stat-row{display:flex;gap:32px;margin-top:24px;flex-wrap:wrap}
+  .stat .v{font-family:"Space Grotesk";font-weight:700;font-size:30px;color:var(--signal)}
+  .stat .k{color:var(--muted);font-size:13px;margin-top:2px}
+
+  .contact{display:grid;grid-template-columns:.95fr 1.05fr;gap:46px;align-items:start}
+  .contact h2{font-size:clamp(28px,3.6vw,40px);margin:14px 0 16px}
+  .contact .lede{color:var(--muted);font-size:16px;margin-bottom:26px;max-width:40ch}
+  .channels{display:flex;flex-direction:column;gap:12px}
+  .ch{display:flex;align-items:center;gap:14px;padding:15px 17px;border:1px solid var(--line);border-radius:12px;
+    background:var(--ink-2);transition:border-color .18s,transform .18s}
+  .ch:hover{border-color:var(--signal);transform:translateX(3px)}
+  .ch .ico{width:38px;height:38px;border-radius:9px;display:grid;place-items:center;background:var(--ink-3);font-size:17px;border:1px solid var(--line-2)}
+  .ch .lbl{font-family:"Space Grotesk";font-weight:600;font-size:14px}
+  .ch .sub{color:var(--muted-2);font-size:12.5px;font-family:"JetBrains Mono"}
+  .ch .arrow{margin-left:auto;color:var(--muted-2);font-family:"JetBrains Mono"}
+
+  .form-card{background:linear-gradient(180deg,var(--ink-2),var(--ink));border:1px solid var(--line);border-radius:16px;padding:28px}
+  .form-card h3{font-family:"Space Grotesk";font-size:18px;margin-bottom:4px}
+  .form-card .fsub{color:var(--muted-2);font-size:13px;margin-bottom:22px;font-family:"JetBrains Mono"}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:12px;font-family:"JetBrains Mono";letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+  .field input,.field select,.field textarea{width:100%;background:var(--ink-3);border:1px solid var(--line-2);border-radius:10px;
+    color:var(--paper);font-family:"Inter";font-size:14.5px;padding:12px 14px;transition:border-color .15s}
+  .field textarea{resize:vertical;min-height:96px}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--signal)}
+  .field select{appearance:none;cursor:pointer}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .form-card .btn{width:100%;justify-content:center;margin-top:6px}
+  .form-status{font-family:"JetBrains Mono";font-size:12.5px;color:var(--teal);margin-top:14px;min-height:18px;text-align:center}
+
+  .final{padding:100px 0;text-align:center}
+  .final h2{font-size:clamp(30px,4.4vw,52px);max-width:18ch;margin:0 auto}
+  .final p{color:var(--muted);margin:20px auto 0;max-width:46ch;font-size:17px}
+  .final .hero-cta{justify-content:center;margin-top:32px}
+
+  footer{border-top:1px solid var(--line);padding:40px 0;position:relative;z-index:1}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .foot .links{display:flex;gap:22px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+  .foot .links a:hover{color:var(--signal)}
+  .foot .copy{font-family:"JetBrains Mono";font-size:11.5px;color:var(--muted-2)}
+
+  @media (max-width:980px){
+    .hero-grid{grid-template-columns:1fr;gap:38px}
+    .systems{grid-template-columns:1fr}
+    .caps{grid-template-columns:1fr 1fr}
+    .price-grid{grid-template-columns:1fr;max-width:440px;margin:0 auto}
+    .about,.contact{grid-template-columns:1fr;gap:30px}
+    .nav-links{display:none}
+    header.nav.open .nav-links{display:flex;flex-direction:column;gap:0;position:absolute;top:68px;left:0;right:0;background:rgba(10,14,20,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:6px 24px 14px}
+    header.nav.open .nav-links a{padding:13px 2px;border-bottom:1px solid var(--line);font-size:15px}
+    header.nav.open .menu-btn{border-color:var(--signal);color:var(--signal)}
+    .menu-btn{display:inline-block}
+  }
+  @media (max-width:760px){ .process{grid-template-columns:1fr 1fr} .caps{grid-template-columns:1fr} }
+  @media (max-width:560px){
+    .process{grid-template-columns:1fr}
+    .form-row{grid-template-columns:1fr}
+    .hero{padding:46px 0 36px}
+    .sec{padding:66px 0}
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a href="#top" class="brand" aria-label="SVATech Automations home">
+      <span class="mark">S</span>
+      <span>SVATech Automations<br><small>engineered to run like production</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#capabilities">Capabilities</a>
+      <a href="#services">Services</a>
+      <a href="#process">Process</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="#contact" class="btn btn-primary">Book a call</a>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">Menu</button>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow">Done-for-you automation</span>
+        <h1 style="margin-top:22px">Run your ops like <span class="accent">production</span>.<br>Not by <span class="strike">hand</span>.</h1>
+        <p class="hero-sub">We design, build, and run production-grade systems for founders and teams &mdash; automations, data pipelines, AI/ML products, and full-stack software &mdash; with the reliability discipline of site reliability engineers behind every one.</p>
+        <div class="pillars">
+          <span class="pill"><i></i>Automation</span>
+          <span class="pill"><i></i>Data Engineering</span>
+          <span class="pill"><i></i>AI / MLOps</span>
+          <span class="pill"><i></i>Software Delivery</span>
+          <span class="pill"><i></i>Reliability &amp; Security</span>
+        </div>
+        <div class="hero-cta">
+          <a href="#contact" class="btn btn-primary">Book a free call &rarr;</a>
+          <a href="#services" class="btn btn-ghost">See what we build</a>
+        </div>
+      </div>
+
+      <div class="console" aria-hidden="true">
+        <div class="console-bar">
+          <span class="dot" style="background:#ff5f57"></span>
+          <span class="dot" style="background:#febc2e"></span>
+          <span class="dot" style="background:#28c840"></span>
+          <span class="title">pipeline.live</span>
+          <span class="live"><span class="p"></span>RUNNING</span>
+        </div>
+        <div class="stream" id="stream"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="marquee-sec">
+    <div class="wrap">
+      <p class="marquee-label">The stack we build on</p>
+      <div class="marquee"><div class="marquee-track" id="track"></div></div>
+    </div>
+  </section>
+
+  <section class="sec" id="capabilities">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Capabilities</span>
+        <h2>One team, the full engineering stack.</h2>
+        <p>We don't just wire automations. We design, build, and run the data, AI, and software systems clients ship to production &mdash; and we cover the roles to do it end to end.</p>
+      </div>
+      <div class="caps">
+
+        <article class="cap">
+          <span class="ix">01</span>
+          <h3>Data Engineering</h3>
+          <p>Pipelines, warehouses, and streaming that turn raw data into something teams can actually use.</p>
+          <div class="roles">Data Engineer &middot; Analytics Engineer</div>
+          <div class="stack"><span>Python</span><span>Spark</span><span>Kafka</span><span>Airflow</span><span>dbt</span><span>Snowflake</span></div>
+        </article>
+
+        <article class="cap">
+          <span class="ix">02</span>
+          <h3>AI / ML &amp; MLOps</h3>
+          <p>From prototype to production model &mdash; trained, deployed, monitored, reproducible. RAG and LLM apps included.</p>
+          <div class="roles">ML Engineer &middot; MLOps Engineer</div>
+          <div class="stack"><span>PyTorch</span><span>TensorFlow</span><span>LangChain</span><span>RAG</span><span>FastAPI</span><span>MLflow</span></div>
+        </article>
+
+        <article class="cap">
+          <span class="ix">03</span>
+          <h3>Backend Engineering</h3>
+          <p>Services and APIs that hold up under real load, in the language your stack already speaks.</p>
+          <div class="roles">Backend Engineer &middot; API Developer</div>
+          <div class="stack"><span>Python</span><span>Java</span><span>Spring Boot</span><span>FastAPI</span><span>PostgreSQL</span><span>gRPC</span></div>
+        </article>
+
+        <article class="cap">
+          <span class="ix">04</span>
+          <h3>Full-Stack &amp; Web Apps</h3>
+          <p>Customer-facing products, dashboards, and internal tools &mdash; shipped, not just designed.</p>
+          <div class="roles">Full-Stack Engineer &middot; Frontend Engineer</div>
+          <div class="stack"><span>React</span><span>TypeScript</span><span>Next.js</span><span>Node</span><span>Supabase</span></div>
+        </article>
+
+        <article class="cap">
+          <span class="ix">05</span>
+          <h3>Cloud, DevOps &amp; Platform</h3>
+          <p>Infrastructure as code, CI/CD, and containers so deploys are boring and repeatable.</p>
+          <div class="roles">DevOps Engineer &middot; Platform Engineer</div>
+          <div class="stack"><span>AWS</span><span>Azure</span><span>Docker</span><span>Kubernetes</span><span>Terraform</span><span>GitHub Actions</span></div>
+        </article>
+
+        <article class="cap">
+          <span class="ix">06</span>
+          <h3>SRE, Observability &amp; Security</h3>
+          <p>Keep it alive, see it clearly, keep it safe &mdash; the discipline behind everything else we build.</p>
+          <div class="roles">Site Reliability Engineer &middot; Security Engineer</div>
+          <div class="stack"><span>New Relic</span><span>Datadog</span><span>PagerDuty</span><span>Splunk</span><span>Wiz</span><span>Qualys</span></div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="services">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Productized systems</span>
+        <h2>Our most-requested builds, ready to ship.</h2>
+        <p>Beyond custom project work, these are fixed-scope systems we deploy fast &mdash; on your stack, monitored for failure, documented with runbooks, and owned by you.</p>
+      </div>
+
+      <div class="lane"><span class="tag">A</span><h3>Growth &amp; Revenue Ops</h3><span class="rule"></span></div>
+      <p class="lane-desc">
+        <span class="goal">The goal: stop losing revenue to slow or forgotten follow-up.</span>
+        Early-stage deals rarely die because the product is wrong &mdash; they die because a reply sat unanswered for six hours, a promising call never got logged, or you ran out of hours before reaching the next prospect. These systems take the human bottleneck out of your revenue motion: every inbound signal &mdash; <b>a reply, a finished call, a fresh lead</b> &mdash; triggers the right next action in seconds, whether or not anyone's at their desk. You stay human where it counts (the actual conversation) and hand the chasing, sorting, and logging to a system that never gets busy, tired, or distracted.
+      </p>
+      <div class="systems">
+        <article class="card">
+          <span class="num">SYS&middot;01</span><h3>Founder-Led Pipeline</h3>
+          <p class="lede">Reply lands, gets classified, CRM updates, you get pinged &mdash; in under two minutes. Respond while they're still thinking about you.</p>
+          <ul>
+            <li>Connects your inbox, enrichment source, and CRM</li>
+            <li>Classifies every reply: interested, not now, unsubscribe, spam</li>
+            <li>Routes hot leads to HubSpot or Pipedrive, context pre-filled</li>
+            <li>Telegram or Slack alert the moment someone's ready</li>
+          </ul>
+          <div class="outcome"><span class="k">Outcome</span><span class="v">First response under 2 min. Zero manual handoffs.</span></div>
+        </article>
+        <article class="card">
+          <span class="num">SYS&middot;02</span><h3>Meeting-to-CRM Pipe</h3>
+          <p class="lede">Every sales call logged, summarized, and actioned automatically &mdash; so no deal stalls because you forgot to write it up.</p>
+          <ul>
+            <li>Connects your meeting recorder to your CRM</li>
+            <li>Extracts action items, objections, and next steps</li>
+            <li>Updates the deal record without you touching it</li>
+            <li>Drafts the follow-up email for your approval</li>
+          </ul>
+          <div class="outcome"><span class="k">Outcome</span><span class="v">No deal stalls because a call went unlogged.</span></div>
+        </article>
+        <article class="card">
+          <span class="num">SYS&middot;03</span><h3>Cold Outreach Engine</h3>
+          <p class="lede">Targeted outreach to your exact ICP, personalized at scale &mdash; and nothing sends until you approve it.</p>
+          <ul>
+            <li>Scrapes and verifies leads matching your buyer profile</li>
+            <li>Writes a personalized opener for every contact</li>
+            <li>Pushes to your sending tool automatically</li>
+            <li>You review and approve before anything goes out</li>
+          </ul>
+          <div class="outcome"><span class="k">Outcome</span><span class="v">Wake up to replies from people who actually fit.</span></div>
+        </article>
+      </div>
+
+      <div class="lane"><span class="tag b">B</span><h3>Reliability, Observability &amp; Security</h3><span class="rule"></span></div>
+      <div class="systems">
+        <article class="card b">
+          <span class="num">SRE&middot;01</span><h3>Observability-in-a-Box</h3>
+          <p class="lede">Know something's wrong before your customers tell you. Dashboards, SLOs, and alerts that actually mean something.</p>
+          <ul>
+            <li>Instruments your services and ships clean dashboards</li>
+            <li>Defines SLOs/SLIs tied to what users feel, not vanity metrics</li>
+            <li>Tunes alerts to kill noise &mdash; page only on what matters</li>
+            <li>Unifies logs, metrics, and traces into one pane</li>
+          </ul>
+          <div class="outcome"><span class="k">Outcome</span><span class="v">See incidents forming. Stop hearing it from customers first.</span></div>
+        </article>
+        <article class="card b">
+          <span class="num">SRE&middot;02</span><h3>Incident &amp; Reliability Automation</h3>
+          <p class="lede">When something breaks at 2am, the system runs the first ten minutes for you &mdash; so a human doesn't start from zero.</p>
+          <ul>
+            <li>Auto-opens the incident channel and pages the right people</li>
+            <li>Runs diagnostic runbooks and posts findings automatically</li>
+            <li>Drafts the postmortem straight from the timeline</li>
+            <li>Tracks error budgets so reliability work gets prioritized</li>
+          </ul>
+          <div class="outcome"><span class="k">Outcome</span><span class="v">Lower mean-time-to-resolution. Less on-call burnout.</span></div>
+        </article>
+        <article class="card b">
+          <span class="num">SRE&middot;03</span><h3>Security &amp; Compliance Automation</h3>
+          <p class="lede">Turn scanner noise and audit busywork into a system that handles itself &mdash; and surfaces only what's actually dangerous.</p>
+          <ul>
+            <li>Triages findings (Wiz, Qualys, Snyk) and routes real risk only</li>
+            <li>Collects SOC 2 / ISO evidence automatically on a schedule</li>
+            <li>Flags exposed secrets and stale access for review</li>
+            <li>Enriches alerts with context before a human ever sees them</li>
+          </ul>
+          <div class="outcome"><span class="k">Outcome</span><span class="v">Audits stop being fire drills. Real risk surfaces first.</span></div>
+        </article>
+      </div>
+
+      <p style="margin-top:34px;color:var(--muted);font-size:15px">
+        Got something specific in mind? <a href="#contact" style="color:var(--signal);font-weight:500">Tell us in 15 minutes &rarr;</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="sec" id="process" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head"><span class="eyebrow">How it works</span><h2>Scoped, built, handed over.</h2></div>
+      <div class="process">
+        <div class="step"><div class="n">1</div><h3>Discovery</h3><p>We map what's breaking and confirm it's the right fit before any money changes hands.</p></div>
+        <div class="step"><div class="n">2</div><h3>Build</h3><p>On your existing tools, with monitoring and failure handling built in. No new subscriptions required.</p></div>
+        <div class="step"><div class="n">3</div><h3>Handoff</h3><p>Everything documented with runbooks and handed to you. Your tools, your system, your ownership.</p></div>
+        <div class="step"><div class="n">4</div><span class="opt">OPTIONAL</span><h3>Support</h3><p>Ongoing optimization and on-call monitoring, available on a monthly or yearly program.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="pricing" style="padding-top:0">
+    <div class="wrap">
+      <div class="sec-head" style="margin-bottom:46px">
+        <span class="eyebrow">Pricing</span>
+        <h2>Start free. Scale on a program.</h2>
+        <p>Some use cases are free &mdash; a single automation or a reliability audit to prove the value. When you want it to keep running and growing, move onto a monthly or yearly program.</p>
+      </div>
+      <div class="price-grid">
+
+        <div class="tier">
+          <div class="name">Starter</div>
+          <p class="for">For testing the water with one real win &mdash; no card required.</p>
+          <div class="price">Free</div>
+          <div class="save">For qualifying use cases</div>
+          <ul>
+            <li>60-min reliability &amp; automation audit</li>
+            <li>One starter automation, built free</li>
+            <li>A single dashboard or alert pipeline</li>
+            <li>Documented and yours to keep</li>
+            <li class="muted">No ongoing support</li>
+            <li class="muted">No monitoring or on-call</li>
+          </ul>
+          <a href="#contact" class="btn btn-ghost">Claim free audit</a>
+        </div>
+
+        <div class="tier feature">
+          <span class="badge">Most popular</span>
+          <div class="name">Operator</div>
+          <p class="for">For founders and teams who want automation shipping continuously.</p>
+          <div class="price">$1,499<span class="per">/month</span></div>
+          <div class="save">Cancel anytime &middot; keep what's built</div>
+          <ul>
+            <li>Everything in Starter</li>
+            <li>2 automation systems built per month</li>
+            <li>Monitoring &amp; failure handling on everything</li>
+            <li>Priority Slack / Telegram support</li>
+            <li>Monthly tune-up &amp; roadmap call</li>
+            <li>Choose from any lane: growth or SRE</li>
+          </ul>
+          <a href="#contact" class="btn btn-primary">Start monthly</a>
+        </div>
+
+        <div class="tier">
+          <span class="badge v">Best value</span>
+          <div class="name">Partner</div>
+          <p class="for">For teams treating automation and reliability as infrastructure.</p>
+          <div class="price">$14,999<span class="per">/year</span></div>
+          <div class="save">Save ~2 months vs monthly</div>
+          <ul>
+            <li>Everything in Operator</li>
+            <li>Unlimited small automations</li>
+            <li>On-call monitoring of critical pipelines</li>
+            <li>Quarterly reliability &amp; security reviews</li>
+            <li>Dedicated build roadmap</li>
+            <li>Lock your rate for 12 months</li>
+          </ul>
+          <a href="#contact" class="btn btn-ghost">Go yearly</a>
+        </div>
+
+      </div>
+      <p class="price-note" style="color:var(--muted);font-size:13.5px;font-family:'Inter';margin-bottom:6px">Need a full project built &mdash; a data platform, an AI product, a web app? Those are scoped as fixed-price engagements. <a href="#contact" style="color:var(--signal);font-weight:600">Book a call for a quote &rarr;</a></p>
+      <p class="price-note">&#9650; Prices are placeholders &mdash; set your own in the code before publishing.</p>
+    </div>
+  </section>
+
+  <section class="sec" id="about" style="padding-top:0">
+    <div class="wrap about">
+      <div>
+        <span class="eyebrow">About</span>
+        <h2 style="margin-top:14px">Built by engineers, for operators like you.</h2>
+        <p>We're an engineering team that builds and runs the automation keeping systems alive at scale &mdash; then we productize that same discipline for founders and teams. Every build is scoped, monitored, documented, and handed over. You own it. No retainer dependency, no lock-in.</p>
+        <p>The difference isn't that we can wire tools together &mdash; plenty of people can. It's that we build them the way production systems get built: to survive failure, not to demo well.</p>
+        <div class="stat-row">
+          <div class="stat"><div class="v">Direct</div><div class="k">Work with the engineers,<br>no account managers</div></div>
+          <div class="stat"><div class="v">Production</div><div class="k">Monitored, documented,<br>built to survive failure</div></div>
+          <div class="stat"><div class="v">100%</div><div class="k">You own<br>the system</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="contact" style="padding-top:0">
+    <div class="wrap contact">
+      <div>
+        <span class="eyebrow">Contact</span>
+        <h2>One place to reach out.</h2>
+        <p class="lede">Tell us what's eating your time, or just book the call. Fifteen minutes is enough to know if we can help.</p>
+        <div class="channels">
+          <a class="ch" id="bookCh" href="#">
+            <span class="ico">&#128197;</span>
+            <span><span class="lbl">Book a free call</span><br><span class="sub">15 min &middot; no pitch</span></span>
+            <span class="arrow">&rarr;</span>
+          </a>
+          <a class="ch" href="mailto:info@svatechsystems.com">
+            <span class="ico">&#9993;</span>
+            <span><span class="lbl">Email</span><br><span class="sub">info@svatechsystems.com</span></span>
+            <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <h3>Tell us what you need</h3>
+        <p class="fsub">Replies within one business day.</p>
+        <form id="contactForm">
+          <!-- FormSubmit config -->
+          <input type="hidden" name="_subject" value="New inquiry — SVATech Automations">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="form-row">
+            <div class="field"><label for="name">Name</label><input id="name" name="name" type="text" required placeholder="Jane Founder"></div>
+            <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required placeholder="jane@company.com"></div>
+          </div>
+          <div class="field">
+            <label for="service">What do you need?</label>
+            <select id="service" name="service">
+              <optgroup label="Productized automations">
+                <option>Founder-Led Pipeline (lead follow-up)</option>
+                <option>Meeting-to-CRM</option>
+                <option>Cold Outreach Engine</option>
+                <option>Observability-in-a-Box</option>
+                <option>Incident &amp; Reliability Automation</option>
+                <option>Security &amp; Compliance Automation</option>
+              </optgroup>
+              <optgroup label="Project work">
+                <option>Data pipeline / platform</option>
+                <option>AI / ML product or MLOps</option>
+                <option>Web app / full-stack build</option>
+                <option>Backend / API build (Python or Java)</option>
+                <option>Cloud / DevOps / platform setup</option>
+              </optgroup>
+              <option>Not sure yet &mdash; start with the free audit</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="plan">Interested in</label>
+            <select id="plan" name="plan">
+              <option>Free starter / audit</option>
+              <option>Operator &mdash; monthly</option>
+              <option>Partner &mdash; yearly</option>
+              <option>One-off build</option>
+            </select>
+          </div>
+          <div class="field"><label for="msg">What's eating your time?</label><textarea id="msg" name="message" placeholder="Right now I manually..."></textarea></div>
+          <button type="submit" class="btn btn-primary">Send message &rarr;</button>
+          <p class="form-status" id="formStatus"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap">
+      <span class="eyebrow" style="margin-bottom:22px">Let's build</span>
+      <h2>Stop wiring tools together. Start shipping.</h2>
+      <p>Bring us the bottleneck &mdash; a manual workflow, a data mess, an AI idea, a build you keep pushing to next sprint. In fifteen minutes you'll know if we can ship it and how fast. No deck. No pitch. Just engineers who've built this before.</p>
+      <div class="hero-cta"><a href="#contact" class="btn btn-primary">Book a free call &rarr;</a></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <a href="#top" class="brand"><span class="mark">S</span><span>SVATech Automations</span></a>
+    <div class="links">
+      <a href="#capabilities">Capabilities</a><a href="#services">Services</a><a href="#pricing">Pricing</a><a href="#process">Process</a>
+      <a href="#about">About</a><a href="#contact">Contact</a>
+      <a href="mailto:info@svatechsystems.com">info@svatechsystems.com</a>
+    </div>
+    <p class="copy">&copy; 2026 SVATech Automations &middot; SVA Tech Systems LLC</p>
+  </div>
+</footer>
+
+<script>
+  const nav=document.getElementById('nav');
+  addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>8),{passive:true});
+  // mobile menu: toggle the nav dropdown, and close it once a link is tapped
+  document.getElementById('menuBtn').addEventListener('click',function(){nav.classList.toggle('open');});
+  document.querySelectorAll('.nav-links a').forEach(function(a){a.addEventListener('click',function(){nav.classList.remove('open');});});
+
+  // ---- CONFIG ----
+  // Leads are emailed to CONTACT_EMAIL via FormSubmit (no backend needed).
+  // IMPORTANT: the first time the form is submitted, FormSubmit emails CONTACT_EMAIL
+  // a one-time confirmation link — click it once to activate. After that, every
+  // submission is delivered to the inbox automatically.
+  // To use a real scheduler for "Book a call", paste your Cal.com/Calendly URL into BOOKING_URL.
+  const CONTACT_EMAIL = 'info@svatechsystems.com';
+  const BOOKING_URL = '';   // e.g. 'https://cal.com/your-handle' — blank = "Book a call" scrolls to the form
+
+  // "Book a free call" row in the contact hub
+  document.getElementById('bookCh').addEventListener('click',function(e){
+    e.preventDefault();
+    if(BOOKING_URL){ window.open(BOOKING_URL,'_blank','noopener'); }
+    else{ document.getElementById('contactForm').scrollIntoView({behavior:'smooth'}); document.getElementById('name').focus(); }
+  });
+
+  var tools=['Python','Java','Spring Boot','Kafka','Airflow','dbt','Snowflake','Spark','PyTorch','TensorFlow','LangChain','FastAPI','React','TypeScript','Node','PostgreSQL','Docker','Kubernetes','Terraform','AWS','Azure','n8n','Datadog','New Relic','PagerDuty','Splunk','Wiz','GitHub Actions'];
+  var track=document.getElementById('track');
+  function build(){return tools.map(function(t){return '<span class="chip">'+t+'</span>';}).join('');}
+  track.innerHTML=build()+build();
+
+  document.getElementById('contactForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var f=e.target, status=document.getElementById('formStatus');
+    var btn=f.querySelector('button[type=submit]');
+    status.style.color='var(--teal)';
+    status.textContent='Sending\u2026';
+    if(btn) btn.disabled=true;
+    fetch('https://formsubmit.co/ajax/'+CONTACT_EMAIL,{
+      method:'POST',
+      headers:{'Accept':'application/json','Content-Type':'application/json'},
+      body:JSON.stringify(Object.fromEntries(new FormData(f).entries()))
+    })
+    .then(function(r){return r.json();})
+    .then(function(){
+      status.style.color='var(--teal)';
+      status.textContent='\u2713 Sent. We\u2019ll reply within one business day.';
+      f.reset();
+    })
+    .catch(function(){
+      // network/last-resort fallback: open the visitor's email client pre-filled
+      var d={}; new FormData(f).forEach(function(v,k){d[k]=v;});
+      var body='Name: '+d.name+'%0D%0AEmail: '+d.email+'%0D%0AService: '+d.service+'%0D%0APlan: '+d.plan+'%0D%0A%0D%0A'+(d.message||'').replace(/\n/g,'%0D%0A');
+      window.location='mailto:'+CONTACT_EMAIL+'?subject='+encodeURIComponent('New inquiry \u2014 '+d.service)+'&body='+body;
+      status.style.color='var(--muted)';
+      status.textContent='Opening your email app\u2026';
+    })
+    .finally(function(){ if(btn) btn.disabled=false; });
+  });
+
+  var reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var stream=document.getElementById('stream');
+  var events=[
+    {i:'\uD83D\uDCE8',m:'Reply received \u2014 <b>founder@acme.io</b>'},
+    {i:'\uD83E\uDDE0',m:'Classified: <span class="ok">INTERESTED</span> <span class="tag">(conf 0.94)</span>'},
+    {i:'\uD83D\uDD04',m:'CRM updated \u2014 stage \u2192 <b>Hot</b>'},
+    {i:'\uD83D\uDD14',m:'Alert sent to on-call <span class="ok">\u2713</span>'},
+    {i:'\uD83D\uDCCA',m:'SLO check \u2014 <b>checkout</b> 99.95% <span class="ok">healthy</span>'},
+    {i:'\u26A0\uFE0F',m:'Latency p95 breaching budget <span class="warn">investigating</span>'},
+    {i:'\uD83D\uDEA8',m:'Incident opened \u2014 runbook <b>rb-014</b> running'},
+    {i:'\uD83D\uDCDD',m:'Postmortem drafted from timeline <span class="ok">\u2713</span>'},
+    {i:'\uD83D\uDD10',m:'Vuln scan triaged \u2014 1 critical routed, 38 noise dropped'},
+    {i:'\uD83E\uDE7A',m:'Health check passed <span class="ok">200 OK</span> <span class="tag">12ms</span>'}
+  ];
+  var idx=0;
+  function now(){return new Date().toTimeString().slice(0,8);}
+  function push(){
+    var e=events[idx%events.length];idx++;
+    var row=document.createElement('div');row.className='ev';
+    row.innerHTML='<span class="t">'+now()+'</span><span class="i">'+e.i+'</span><span class="m">'+e.m+'</span>';
+    stream.appendChild(row);
+    while(stream.children.length>9) stream.removeChild(stream.firstChild);
+    stream.scrollTop=stream.scrollHeight;
+  }
+  for(var k=0;k<6;k++) push();
+  if(!reduce) setInterval(push,1900);
+</script>
+</body>
+</html>
