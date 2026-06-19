@@ -226,25 +226,131 @@
   .foot .links a:hover{color:var(--signal)}
   .foot .copy{font-family:"JetBrains Mono";font-size:11.5px;color:var(--muted-2)}
 
+  /* touch: min tap targets + prevent iOS zoom on focus */
+  @media (hover:none) and (pointer:coarse){
+    .btn{min-height:48px}
+    .ch{min-height:60px}
+    .nav-links a{min-height:44px;display:flex;align-items:center}
+    .field input,.field select,.field textarea{font-size:16px}
+  }
+
+  /* TABLET ≤980px */
   @media (max-width:980px){
-    .hero-grid{grid-template-columns:1fr;gap:38px}
+    .hero-grid{grid-template-columns:1fr;gap:28px}
     .systems{grid-template-columns:1fr}
     .caps{grid-template-columns:1fr 1fr}
-    .price-grid{grid-template-columns:1fr;max-width:440px;margin:0 auto}
+    .price-grid{grid-template-columns:1fr;max-width:480px;margin:0 auto}
     .about,.contact{grid-template-columns:1fr;gap:30px}
     .nav-links{display:none}
-    header.nav.open .nav-links{display:flex;flex-direction:column;gap:0;position:absolute;top:68px;left:0;right:0;background:rgba(10,14,20,.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:6px 24px 14px}
+    header.nav.open .nav-links{display:flex;flex-direction:column;gap:0;position:absolute;
+      top:68px;left:0;right:0;background:rgba(10,14,20,.98);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--line);padding:6px 24px 14px;z-index:100}
     header.nav.open .nav-links a{padding:13px 2px;border-bottom:1px solid var(--line);font-size:15px}
     header.nav.open .menu-btn{border-color:var(--signal);color:var(--signal)}
     .menu-btn{display:inline-block}
+    .stream{height:220px}
   }
-  @media (max-width:760px){ .process{grid-template-columns:1fr 1fr} .caps{grid-template-columns:1fr} }
-  @media (max-width:560px){
-    .process{grid-template-columns:1fr}
+
+  /* LARGE MOBILE ≤760px */
+  @media (max-width:760px){
+    .process{grid-template-columns:1fr 1fr}
+    .caps{grid-template-columns:1fr}
+    .stat-row{gap:20px}
+    .lane-desc{font-size:14px}
+    .tier .badge{font-size:10px;padding:4px 9px}
+    .foot{flex-direction:column;align-items:flex-start;gap:16px}
+    .foot .links{gap:14px}
+  }
+
+  /* MOBILE ≤600px */
+  @media (max-width:600px){
+    :root{--r:12px}
+    .wrap{padding:0 18px}
+    .brand small{display:none}
+    .brand{font-size:14px;gap:8px}
+    .brand .mark{width:26px;height:26px;font-size:12px;flex-shrink:0}
+    .nav-cta .btn{padding:9px 13px;font-size:13px}
+    .hero{padding:36px 0 24px}
+    h1{font-size:clamp(28px,9vw,44px);letter-spacing:-.02em}
+    .hero-sub{font-size:14.5px;margin-top:16px;line-height:1.6}
+    .pillars{flex-wrap:nowrap;overflow-x:auto;gap:7px;margin-top:16px;
+      -webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:3px}
+    .pillars::-webkit-scrollbar{display:none}
+    .pill{flex-shrink:0;font-size:10px;padding:5px 10px}
+    .hero-cta{flex-direction:column;gap:10px;margin-top:22px}
+    .hero-cta .btn{width:100%;justify-content:center;padding:14px;font-size:15px}
+    .console{margin-top:2px}
+    .stream{height:175px;font-size:11.5px}
+    .ev{grid-template-columns:50px 14px 1fr;gap:5px;padding:7px 12px}
+    .ev .t{font-size:10.5px}
+    .marquee-sec{padding:18px 0 4px}
+    .chip{font-size:12.5px}
+    .sec{padding:50px 0}
+    .sec-head h2{font-size:clamp(21px,6.5vw,30px)}
+    .sec-head p{font-size:14px;margin-top:10px}
+    section[id]{scroll-margin-top:72px}
+    .caps{grid-template-columns:1fr;gap:12px}
+    .cap{padding:18px 16px}
+    .cap h3{font-size:16px}
+    .cap p{font-size:13px}
+    .cap .stack{gap:5px;margin-top:10px}
+    .cap .stack span{font-size:10px;padding:2px 7px}
+    .lane{margin:32px 0 14px}
+    .lane h3{font-size:13px}
+    .lane-desc{font-size:13px;padding-left:12px;margin-bottom:18px}
+    .lane-desc .goal{font-size:14.5px}
+    .card{padding:18px 15px}
+    .card h3{font-size:16px;margin:9px 0 7px}
+    .card .lede{font-size:13px}
+    .card li{font-size:13px;gap:8px}
+    .outcome .v{font-size:13px}
+    .process{grid-template-columns:1fr;gap:10px}
+    .step{padding:16px 15px}
+    .step h3{font-size:15px}
+    .step p{font-size:13px}
+    .price-grid{max-width:100%;gap:14px}
+    .tier{padding:22px 16px}
+    .tier .name{font-size:17px}
+    .tier .price{font-size:30px}
+    .tier .badge{left:14px;top:-10px}
+    .tier li{font-size:13px}
+    .tier .for{font-size:12px}
+    .tier .save{font-size:11px}
+    .stat-row{gap:16px;flex-wrap:wrap}
+    .stat .v{font-size:22px}
+    .stat .k{font-size:12px}
+    .contact h2{font-size:clamp(21px,6.5vw,30px)}
+    .form-card{padding:18px 14px}
+    .form-card h3{font-size:15px}
     .form-row{grid-template-columns:1fr}
-    .hero{padding:46px 0 36px}
-    .sec{padding:66px 0}
+    .channels{gap:8px}
+    .ch{padding:11px 12px;gap:10px}
+    .ch .ico{width:32px;height:32px;font-size:14px}
+    .ch .lbl{font-size:13px}
+    .ch .sub{font-size:11px}
+    .final{padding:60px 0}
+    .final h2{font-size:clamp(22px,7.5vw,36px)}
+    .final p{font-size:14px}
+    .final .hero-cta{flex-direction:column;align-items:stretch}
+    .final .hero-cta .btn{width:100%;justify-content:center}
+    .foot{flex-direction:column;align-items:flex-start;gap:12px}
+    .foot .links{gap:10px;font-size:12px;flex-wrap:wrap}
+    .foot .copy{font-size:10.5px}
   }
+
+  /* TINY ≤380px */
+  @media (max-width:380px){
+    .wrap{padding:0 14px}
+    h1{font-size:26px}
+    .brand{font-size:13px}
+    .tier .price{font-size:27px}
+    .cap h3,.card h3,.step h3{font-size:15px}
+    .stream{height:155px}
+    .ev{grid-template-columns:42px 12px 1fr;font-size:10.5px}
+    .step .n{width:26px;height:26px;font-size:11px;border-radius:7px}
+    .pill{font-size:9.5px;padding:4px 8px}
+  }
+
 </style>
 </head>
 <body>
